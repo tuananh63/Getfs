@@ -1,0 +1,144 @@
+local plr = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "AnDepZaiHub_UI"
+
+-- Logo nhỏ góc trên trái
+local logo = Instance.new("ImageLabel", gui)
+logo.Image = "rbxassetid://17258796896"
+logo.Size = UDim2.new(0, 24, 0, 24)
+logo.Position = UDim2.new(0, 6, 0, 6)
+logo.BackgroundTransparency = 1
+
+-- Tab bar nhỏ gọn
+local tabBar = Instance.new("Frame", gui)
+tabBar.Size = UDim2.new(0, 400, 0, 28)
+tabBar.Position = UDim2.new(0.5, -200, 0, 10)
+tabBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+tabBar.BorderSizePixel = 1
+tabBar.BorderColor3 = Color3.fromRGB(255, 221, 0)
+
+local tabNames = {"Main", "Item Farm", "Race V4", "Visual"}
+local tabs, pages = {}, {}
+
+-- Container
+local container = Instance.new("Frame", gui)
+container.Size = UDim2.new(0, 400, 0, 240)
+container.Position = UDim2.new(0.5, -200, 0, 45)
+container.BackgroundTransparency = 1
+
+-- Toggle tạo checkbox
+local function newToggle(parent, text, y)
+    local holder = Instance.new("Frame", parent)
+    holder.Size = UDim2.new(1, -20, 0, 28)
+    holder.Position = UDim2.new(0, 10, 0, y)
+    holder.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    holder.BorderColor3 = Color3.fromRGB(255, 221, 0)
+
+    local label = Instance.new("TextLabel", holder)
+    label.Text = text
+    label.Font = Enum.Font.SourceSansBold
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.TextSize = 16
+    label.Position = UDim2.new(0, 8, 0, 0)
+    label.Size = UDim2.new(1, -40, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local toggle = Instance.new("TextButton", holder)
+    toggle.Size = UDim2.new(0, 24, 0, 24)
+    toggle.Position = UDim2.new(1, -30, 0.5, -12)
+    toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    toggle.BorderColor3 = Color3.fromRGB(255, 221, 0)
+    toggle.Text = ":~:"
+    toggle.AutoButtonColor = false
+
+    local fill = Instance.new("Frame", toggle)
+    fill.Size = UDim2.new(0.8, 0, 0.8, 0)
+    fill.Position = UDim2.new(0.1, 0, 0.1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(38, 180, 255)
+    fill.Visible = false
+
+    local state = false
+    toggle.MouseButton1Click:Connect(function()
+        state = not state
+        fill.Visible = state
+        print(text .. ": " .. tostring(state))
+    end)
+end
+
+-- Tạo tab & page + khung nền bo tròn chứa 2 cột
+local function createTab(name, index)
+    local btn = Instance.new("TextButton", tabBar)
+    btn.Size = UDim2.new(0, 100, 1, 0)
+    btn.Position = UDim2.new(0, (index - 1) * 100, 0, 0)
+    btn.Text = name
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 15
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    btn.BorderColor3 = Color3.fromRGB(255, 221, 0)
+    tabs[name] = btn
+
+    local page = Instance.new("Frame", container)
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.BackgroundTransparency = 1
+    page.Visible = false
+    pages[name] = page
+
+    -- Khung bo tròn chứa 2 cột
+    local bg = Instance.new("Frame", page)
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    bg.BorderColor3 = Color3.fromRGB(255, 221, 0)
+
+    local corner = Instance.new("UICorner", bg)
+    corner.CornerRadius = UDim.new(0, 10)
+
+    -- Hai cột
+    local left = Instance.new("Frame", bg)
+    left.Size = UDim2.new(0, 180, 1, -20)
+    left.Position = UDim2.new(0, 10, 0, 10)
+    left.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    left.BorderColor3 = Color3.fromRGB(50,50,50)
+
+    local right = left:Clone()
+    right.Parent = bg
+    right.Position = UDim2.new(1, -190, 0, 10)
+
+    return btn, page, left, right
+end
+
+for i, name in ipairs(tabNames) do
+    local btn, page, left, right = createTab(name, i)
+    if name == "Main" then
+        newToggle(left, "Auto Farm Cake Prince", 10)
+        newToggle(left, "Auto Attack Boss", 50)
+        newToggle(right, "Get Quest When Farm", 10)
+        newToggle(right, "Tween Fast", 50)
+    elseif name == "Item Farm" then
+        newToggle(left, "Auto Chest Farm", 10)
+        newToggle(left, "Auto Grab Fruit", 50)
+    elseif name == "Race V4" then
+        newToggle(left, "Kích hoạt Race V3", 10)
+        newToggle(left, "Kích hoạt Race V4", 50)
+        newToggle(right, "BypassTP", 10)
+    elseif name == "Visual" then
+        newToggle(left, "ESP Boss", 10)
+    end
+end
+
+-- Bật tab đầu tiên
+pages["Main"].Visible = true
+tabs["Main"].BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+-- Tab switching
+for name, btn in pairs(tabs) do
+    btn.MouseButton1Click:Connect(function()
+        for n, p in pairs(pages) do
+            p.Visible = false
+            tabs[n].BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        end
+        pages[name].Visible = true
+        btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    end)
+end
